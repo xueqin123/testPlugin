@@ -10,6 +10,7 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
     private Button button1;
     private Button button2;
+    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,5 +30,12 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("按钮2 点击");
             }
         });
+        textView = findViewById(R.id.test_view);
     }
+
+    private boolean setQinxueText(String text, int position) {
+        textView.setText(text);
+        return false;
+    }
+
 }

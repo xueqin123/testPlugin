@@ -32,8 +32,8 @@ public class MyClassVisitor extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
         MethodVisitor methodVisitor = cv.visitMethod(access, name, descriptor, signature, exceptions);
+        LogUtil.i(TAG, "visitMethod() access: " + access + " name: " + name + " descriptor: " + descriptor + " signature: " + signature + " exceptions: " + Arrays.toString(exceptions));
         if (isMatchOnClickListener(name)) {
-            LogUtil.i(TAG, "实现了该接口的类： " + name);
             methodVisitor = new MyAdapter(methodVisitor, access, name, descriptor) {
                 @Override
                 protected void onMethodExit(int opcode) {

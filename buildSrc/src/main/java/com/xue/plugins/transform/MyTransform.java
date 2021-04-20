@@ -59,13 +59,13 @@ public class MyTransform extends Transform {
         Collection<TransformInput> inputs = transformInvocation.getInputs();
         for (TransformInput input : inputs) {
             //处理 jar 包
-            handlerJarClass(input.getJarInputs(), transformInvocation);
+            transJarClass(input.getJarInputs(), transformInvocation);
             //处理手写的源码
-            handleDirClass(input.getDirectoryInputs(), transformInvocation);
+            transDirClass(input.getDirectoryInputs(), transformInvocation);
         }
     }
 
-    private void handlerJarClass(Collection<JarInput> jarInputs, TransformInvocation transformInvocation) throws IOException {
+    private void transJarClass(Collection<JarInput> jarInputs, TransformInvocation transformInvocation) throws IOException {
         LogUtil.i(TAG, "handlerJarClass()------------------------------------------------------ size: " + jarInputs.size());
         for (JarInput jarInput : jarInputs) {
             String destName = jarInput.getFile().getName();
@@ -83,7 +83,7 @@ public class MyTransform extends Transform {
         }
     }
 
-    private void handleDirClass(Collection<DirectoryInput> directoryInputs, TransformInvocation transformInvocation) throws IOException {
+    private void transDirClass(Collection<DirectoryInput> directoryInputs, TransformInvocation transformInvocation) throws IOException {
         LogUtil.i(TAG, "transDirectoryInput()------------------------------------------------------ size: " + directoryInputs.size());
         for (DirectoryInput directoryInput : directoryInputs) {
             File dir = directoryInput.getFile();
@@ -93,9 +93,7 @@ public class MyTransform extends Transform {
             Map<String, File> modifyMap = new HashMap<>();
             Collection<File> files = FileUtils.listFiles(dir, new String[]{"class"}, true);
             for (File classFile : files) {
-                if (!classFile.getName().endsWith("R.class")
-                        && !classFile.getName().endsWith("BuildConfig.class")
-                        && !classFile.getName().contains("R$")) {
+                if (!classFile.getName().endsWith("R.class") && !classFile.getName().endsWith("BuildConfig.class") && !classFile.getName().contains("R$")) {
                     File modified = modifyClassFile(dir, classFile, transformInvocation.getContext().getTemporaryDir());
                     String classRealName = classFile.getAbsolutePath().replace(dir.getAbsolutePath(), "");
                     modifyMap.put(classRealName, modified);
