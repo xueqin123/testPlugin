@@ -21,9 +21,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class MyTransform extends Transform {
     private static String TAG = "MyTransform";
@@ -31,31 +34,27 @@ public class MyTransform extends Transform {
 
     @Override
     public String getName() {
-        LogUtil.i(TAG, "getName()");
         return "MyTransform";
     }
 
     @Override
     public Set<QualifiedContent.ContentType> getInputTypes() {
-        LogUtil.i(TAG, "getInputTypes()");
         return TransformManager.CONTENT_CLASS;
     }
 
     @Override
     public Set<? super QualifiedContent.Scope> getScopes() {
-        LogUtil.i(TAG, "getScopes()");
         return TransformManager.SCOPE_FULL_PROJECT;
     }
 
     @Override
     public boolean isIncremental() {
-        LogUtil.i(TAG, "isIncremental()");
         return false;
     }
 
     @Override
     public void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
-        LogUtil.i(TAG, "transform()");
+        LogUtil.i(TAG, "transform() transformInvocation: " + transformInvocation);
         Collection<TransformInput> inputs = transformInvocation.getInputs();
         for (TransformInput input : inputs) {
             //处理 jar 包
@@ -72,6 +71,12 @@ public class MyTransform extends Transform {
             String absolutePath = jarInput.getFile().getAbsolutePath();
             LogUtil.i(TAG, "jar包名称: " + destName);
             LogUtil.i(TAG, "jar包路径: " + absolutePath);
+            JarFile jarFile = new JarFile(jarInput.getFile());
+            Enumeration<JarEntry> classes = jarFile.entries();
+            while (classes.hasMoreElements()) {
+                JarEntry libClass = classes.nextElement();
+                LogUtil.i(TAG, " libClass.getName(): " + libClass.getName());
+            }
             byte[] md5Name = DigestUtils.md5(absolutePath);
             if (destName.endsWith(".jar")) {
                 destName.substring(0, destName.length() - 4);

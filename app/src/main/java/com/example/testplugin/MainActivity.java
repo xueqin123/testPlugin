@@ -1,16 +1,18 @@
 package com.example.testplugin;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+import com.example.annotion.MyAnnotation;
+
+public class MainActivity extends Activity {
     private Button button1;
     private Button button2;
     private TextView textView;
+    private String str = "testQinxueStr";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.test_view);
     }
 
+    @MyAnnotation
     private boolean setQinxueText(String text, int position) {
         textView.setText(text);
         return false;
