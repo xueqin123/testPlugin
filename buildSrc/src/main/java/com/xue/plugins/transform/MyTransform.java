@@ -11,10 +11,14 @@ import com.android.build.api.transform.TransformInvocation;
 import com.android.build.gradle.internal.pipeline.TransformManager;
 import com.xue.plugins.log.LogUtil;
 import com.xue.plugins.manager.asm.ASMUtils;
+import com.xue.plugins.manager.rw.MyClassVisitor;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -128,7 +132,7 @@ public class MyTransform extends Transform {
                     .replace(File.separator, ".")
                     .replace(".class", "");
             byte[] sourceClassBytes = IOUtils.toByteArray(new FileInputStream(classFile));
-            byte[] modifyClassBytes = ASMUtils.modifyClass(sourceClassBytes);
+            byte[] modifyClassBytes = modifyClass(sourceClassBytes);
             if (modifyClassBytes != null) {
                 modified = new File(tempDir, className.replace(".", "") + ".class");
                 if (modified.exists()) {
@@ -142,5 +146,26 @@ public class MyTransform extends Transform {
             e.printStackTrace();
         }
         return modified;
+    }
+
+    private byte[] modifyClass(byte[] src) {
+        byte[] classBytesCodes = null;
+        try {
+            classBytesCodes = modifyClasses(src);
+            if (classBytesCodes == null) {
+                classBytesCodes = src;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return classBytesCodes;
+    }
+
+    private byte[] modifyClasses(byte[] src) {
+        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+        ClassVisitor classVisitor = new MyClassVisitor(classWriter);
+        ClassReader classReader = new ClassReader(src);
+        classReader.accept(classVisitor, ClassReader.EXPAND_FRAMES);
+        return classWriter.toByteArray();
     }
 }

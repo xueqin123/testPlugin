@@ -2,6 +2,7 @@ package com.xue.plugins.manager.rw;
 
 
 import com.xue.plugins.log.LogUtil;
+import com.xue.plugins.manager.asm.ASMUtils;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
@@ -19,6 +20,7 @@ public class MyClassVisitor extends ClassVisitor {
     private String TAG = "MyClassVisitor";
     private String mClassName;
     private String[] mInterfaces;
+    private boolean isASM = true;
 
     public MyClassVisitor(ClassVisitor classVisitor) {
         super(Opcodes.ASM5, classVisitor);
@@ -30,6 +32,13 @@ public class MyClassVisitor extends ClassVisitor {
         mClassName = name;
         mInterfaces = interfaces;
         LogUtil.i(TAG, "visit() mClassName: " + mClassName + " mInterfaces: " + Arrays.toString(mInterfaces));
+        if (mClassName.equals("com/example/testplugin/MainActivity")) {
+            if (isASM) {
+                ASMUtils.addMethodSum(cv);
+            }else {
+                //todo
+            }
+        }
     }
 
     @Override
@@ -60,9 +69,9 @@ public class MyClassVisitor extends ClassVisitor {
                 @Override
                 protected void onMethodExit(int opcode) {
                     super.onMethodExit(opcode);
-                    mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
-                    mv.visitLdcInsn("点击结束");
-                    mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
+                    if(isASM){
+                        ASMUtils.addLog(mv);
+                    }
                 }
             };
         }
@@ -80,6 +89,7 @@ public class MyClassVisitor extends ClassVisitor {
         }
         return false;
     }
+
 
     @Override
     public void visitInnerClass(String name, String outerName, String innerName, int access) {
@@ -128,4 +138,6 @@ public class MyClassVisitor extends ClassVisitor {
         LogUtil.i(TAG, "visitTypeAnnotation() typeRef: " + typeRef + " typePath: " + typePath + " descriptor: " + descriptor + " visible: " + visible);
         return super.visitTypeAnnotation(typeRef, typePath, descriptor, visible);
     }
+
+
 }

@@ -13,6 +13,7 @@ public class MainActivity extends Activity {
     private Button button2;
     private TextView textView;
     private String str = "testQinxueStr";
+    private int num1 = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
