@@ -33,6 +33,5 @@ public class MyPlugin implements Plugin<Project> {
                 LogUtil.i(TAG, "afterEvaluate()");
             }
         });
-
     }
 }

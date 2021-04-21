@@ -11,6 +11,7 @@ import com.android.build.api.transform.TransformInvocation;
 import com.android.build.gradle.internal.pipeline.TransformManager;
 import com.xue.plugins.log.LogUtil;
 import com.xue.plugins.manager.asm.ASMUtils;
+import com.xue.plugins.manager.javasist.JavasistUtils;
 import com.xue.plugins.manager.rw.MyClassVisitor;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -31,6 +32,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import javassist.CannotCompileException;
+import javassist.NotFoundException;
 
 public class MyTransform extends Transform {
     private static String TAG = "MyTransform";
@@ -59,6 +63,7 @@ public class MyTransform extends Transform {
     @Override
     public void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         LogUtil.i(TAG, "transform() transformInvocation: " + transformInvocation);
+        testCreateClass(transformInvocation);
         Collection<TransformInput> inputs = transformInvocation.getInputs();
         for (TransformInput input : inputs) {
             //处理 jar 包
@@ -167,5 +172,24 @@ public class MyTransform extends Transform {
         ClassReader classReader = new ClassReader(src);
         classReader.accept(classVisitor, ClassReader.EXPAND_FRAMES);
         return classWriter.toByteArray();
+    }
+
+    /**
+     * 测试创建类
+     *
+     * @param transformInvocation
+     */
+    private void testCreateClass(TransformInvocation transformInvocation) {
+        File gen = transformInvocation.getOutputProvider().getContentLocation("myGen", getInputTypes(), getScopes(), Format.DIRECTORY);
+        LogUtil.i(TAG, "gen.getAbsolutePath(): " + gen.getAbsolutePath());
+        try {
+            JavasistUtils.createPerson(gen.getAbsolutePath());
+        } catch (CannotCompileException e) {
+            e.printStackTrace();
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
